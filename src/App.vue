@@ -65,6 +65,20 @@ const taskSummary = computed(() => {
   }
 })
 
+const taskFilters = ['全部', '工作', '家庭', '学习']
+const selectedFilter = ref('全部')
+
+const filterTasks = (tasks) => {
+  if (selectedFilter.value === '全部') {
+    return tasks
+  }
+
+  return tasks.filter((task) => task.tag === selectedFilter.value)
+}
+
+const visibleTodayTasks = computed(() => filterTasks(todayTasks.value))
+const visibleLaterTasks = computed(() => filterTasks(laterTasks.value))
+
 let nextTaskId = 6
 const taskTypeMap = {
   工作: {
@@ -162,10 +176,16 @@ const requestDeleteTask = async (taskId) => {
         <div class="panel-block">
           <p class="panel-title">筛选</p>
           <div class="filter-list">
-            <button type="button" class="filter-pill is-active">全部</button>
-            <button type="button" class="filter-pill">工作</button>
-            <button type="button" class="filter-pill">家庭</button>
-            <button type="button" class="filter-pill">学习</button>
+            <button
+              v-for="filter in taskFilters"
+              :key="filter"
+              type="button"
+              class="filter-pill"
+              :class="{ 'is-active': selectedFilter === filter }"
+              @click="selectedFilter = filter"
+            >
+              {{ filter }}
+            </button>
           </div>
         </div>
       </aside>
@@ -173,8 +193,18 @@ const requestDeleteTask = async (taskId) => {
       <section class="list-panel">
         <TaskComposer @add="addTask" />
 
-        <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" @delete="requestDeleteTask" />
-        <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" @delete="requestDeleteTask" />
+        <TaskGroup
+          title="今天"
+          :count="visibleTodayTasks.length"
+          :items="visibleTodayTasks"
+          @delete="requestDeleteTask"
+        />
+        <TaskGroup
+          title="稍后"
+          :count="visibleLaterTasks.length"
+          :items="visibleLaterTasks"
+          @delete="requestDeleteTask"
+        />
       </section>
     </section>
 
