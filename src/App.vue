@@ -1,8 +1,10 @@
 <script setup>
+import { computed, ref } from 'vue'
+
 import TaskComposer from './components/TaskComposer.vue'
 import TaskGroup from './components/TaskGroup.vue'
 
-const todayTasks = [
+const todayTasks = ref([
   {
     title: '规划本周看板',
     description: '整理优先级，给本周任务建立清晰边界。',
@@ -24,9 +26,9 @@ const todayTasks = [
     variant: 'tag-ink',
     done: false,
   },
-]
+])
 
-const laterTasks = [
+const laterTasks = ref([
   {
     title: '优化移动端间距',
     description: '确保窄屏下卡片仍然保持呼吸感。',
@@ -43,7 +45,30 @@ const laterTasks = [
     done: false,
     muted: true,
   },
-]
+])
+
+const taskSummary = computed(() => {
+  const totalTasks = todayTasks.value.length + laterTasks.value.length
+  const completedTasks = [...todayTasks.value, ...laterTasks.value].filter((task) => task.done)
+
+  return {
+    total: totalTasks,
+    completed: completedTasks.length,
+    remaining: totalTasks - completedTasks.length,
+  }
+})
+
+const addTask = ({ title, description }) => {
+  const newTask = {
+    title,
+    description: description || '暂无描述',
+    tag: '新建',
+    variant: 'tag-soft',
+    done: false,
+  }
+
+  todayTasks.value.unshift(newTask)
+}
 </script>
 
 <template>
@@ -60,17 +85,17 @@ const laterTasks = [
       <div class="hero-stats" aria-label="任务概览">
         <article class="stat-card stat-primary">
           <span class="stat-label">今日</span>
-          <strong>08</strong>
+          <strong>{{ taskSummary.total }}</strong>
           <small>当前关注任务</small>
         </article>
         <article class="stat-card">
           <span class="stat-label">已完成</span>
-          <strong>05</strong>
+          <strong>{{ taskSummary.completed }}</strong>
           <small>已完成条目</small>
         </article>
         <article class="stat-card">
           <span class="stat-label">剩余</span>
-          <strong>03</strong>
+          <strong>{{ taskSummary.remaining }}</strong>
           <small>待完成任务</small>
         </article>
       </div>
@@ -100,7 +125,7 @@ const laterTasks = [
       </aside>
 
       <section class="list-panel">
-        <TaskComposer />
+        <TaskComposer @add="addTask" />
 
         <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" />
         <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" />
