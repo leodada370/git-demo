@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue'
 
+import ConfirmDialog from './components/ConfirmDialog.vue'
 import TaskComposer from './components/TaskComposer.vue'
 import TaskGroup from './components/TaskGroup.vue'
+import { useConfirmDialog } from './composables/useConfirmDialog'
 
 const todayTasks = ref([
   {
@@ -65,6 +67,8 @@ const taskSummary = computed(() => {
 
 let nextTaskId = 6
 
+const { visible, options, confirm, handleConfirm, handleCancel } = useConfirmDialog()
+
 const addTask = ({ title, description }) => {
   const newTask = {
     id: nextTaskId,
@@ -82,6 +86,19 @@ const addTask = ({ title, description }) => {
 const deleteTask = (taskId) => {
   todayTasks.value = todayTasks.value.filter((task) => task.id !== taskId)
   laterTasks.value = laterTasks.value.filter((task) => task.id !== taskId)
+}
+
+const requestDeleteTask = async (taskId) => {
+  const shouldDelete = await confirm({
+    title: '确认删除任务',
+    message: '删除后将无法恢复，确定要删除这个任务吗？',
+    confirmText: '确定删除',
+    cancelText: '取消',
+  })
+
+  if (shouldDelete) {
+    deleteTask(taskId)
+  }
 }
 </script>
 
@@ -141,10 +158,20 @@ const deleteTask = (taskId) => {
       <section class="list-panel">
         <TaskComposer @add="addTask" />
 
-        <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" @delete="deleteTask" />
-        <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" @delete="deleteTask" />
+        <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" @delete="requestDeleteTask" />
+        <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" @delete="requestDeleteTask" />
       </section>
     </section>
+
+    <ConfirmDialog
+      :visible="visible"
+      :title="options.title"
+      :message="options.message"
+      :confirm-text="options.confirmText"
+      :cancel-text="options.cancelText"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </main>
 </template>
 
