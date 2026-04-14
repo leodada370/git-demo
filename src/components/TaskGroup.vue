@@ -1,6 +1,8 @@
 <script setup>
 import TaskItem from './TaskItem.vue'
 
+const emit = defineEmits(['delete'])
+
 defineProps({
   title: {
     type: String,
@@ -25,7 +27,7 @@ defineProps({
     </div>
 
     <ul class="task-list">
-      <TaskItem v-for="item in items" :key="item.title" :item="item" />
+      <TaskItem v-for="item in items" :key="item.id" :item="item" @delete="emit('delete', $event)" />
     </ul>
   </section>
 </template>
