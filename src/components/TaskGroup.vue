@@ -25,7 +25,7 @@ defineProps({
     </div>
 
     <ul class="task-list">
-      <TaskItem v-for="item in items" :key="item.title" :item="item" />
+      <TaskItem v-for="item in items" :key="item.id" :item="item" />
     </ul>
   </section>
 </template>

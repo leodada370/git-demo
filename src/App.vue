@@ -6,6 +6,7 @@ import TaskGroup from './components/TaskGroup.vue'
 
 const todayTasks = ref([
   {
+    id: 1,
     title: '规划本周看板',
     description: '整理优先级，给本周任务建立清晰边界。',
     tag: '工作',
@@ -13,6 +14,7 @@ const todayTasks = ref([
     done: true,
   },
   {
+    id: 2,
     title: '查看设计参考',
     description: '收集一版更稳定的视觉方向和色彩策略。',
     tag: '设计',
@@ -20,6 +22,7 @@ const todayTasks = ref([
     done: false,
   },
   {
+    id: 3,
     title: '整理实现说明',
     description: '把需要后续接入的功能点提前标注出来。',
     tag: '草稿',
@@ -30,6 +33,7 @@ const todayTasks = ref([
 
 const laterTasks = ref([
   {
+    id: 4,
     title: '优化移动端间距',
     description: '确保窄屏下卡片仍然保持呼吸感。',
     tag: '界面',
@@ -38,6 +42,7 @@ const laterTasks = ref([
     muted: true,
   },
   {
+    id: 5,
     title: '补充最后润色',
     description: '收尾时统一阴影、圆角和层级表现。',
     tag: '润色',
@@ -58,15 +63,36 @@ const taskSummary = computed(() => {
   }
 })
 
-const addTask = ({ title, description }) => {
+let nextTaskId = 6
+
+const taskTypeMap = {
+  工作: {
+    tag: '工作',
+    variant: 'tag-soft',
+  },
+  家庭: {
+    tag: '家庭',
+    variant: 'tag-warm',
+  },
+  学习: {
+    tag: '学习',
+    variant: 'tag-ink',
+  },
+}
+
+const addTask = ({ title, description, type }) => {
+  const selectedType = taskTypeMap[type] ?? taskTypeMap.工作
+
   const newTask = {
+    id: nextTaskId,
     title,
     description: description || '暂无描述',
-    tag: '新建',
-    variant: 'tag-soft',
+    tag: selectedType.tag,
+    variant: selectedType.variant,
     done: false,
   }
 
+  nextTaskId += 1
   todayTasks.value.unshift(newTask)
 }
 </script>
