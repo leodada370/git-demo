@@ -1,7 +1,7 @@
 <script setup>
 import TaskItem from './TaskItem.vue'
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'toggle'])
 
 defineProps({
   title: {
@@ -27,7 +27,13 @@ defineProps({
     </div>
 
     <ul class="task-list">
-      <TaskItem v-for="item in items" :key="item.id" :item="item" @delete="emit('delete', $event)" />
+      <TaskItem
+        v-for="item in items"
+        :key="item.id"
+        :item="item"
+        @delete="emit('delete', $event)"
+        @toggle="emit('toggle', $event)"
+      />
     </ul>
   </section>
 </template>

@@ -57,11 +57,13 @@ const laterTasks = ref([
 const taskSummary = computed(() => {
   const totalTasks = todayTasks.value.length + laterTasks.value.length
   const completedTasks = [...todayTasks.value, ...laterTasks.value].filter((task) => task.done)
+  const progress = totalTasks === 0 ? 0 : Math.round((completedTasks.length / totalTasks) * 100)
 
   return {
     total: totalTasks,
     completed: completedTasks.length,
     remaining: totalTasks - completedTasks.length,
+    progress,
   }
 })
 
@@ -101,6 +103,14 @@ const addTask = ({ title, description, type }) => {
 const deleteTask = (taskId) => {
   todayTasks.value = todayTasks.value.filter((task) => task.id !== taskId)
   laterTasks.value = laterTasks.value.filter((task) => task.id !== taskId)
+}
+
+const toggleTaskDone = (taskId) => {
+  const updateTaskList = (tasks) =>
+    tasks.map((task) => (task.id === taskId ? { ...task, done: !task.done } : task))
+
+  todayTasks.value = updateTaskList(todayTasks.value)
+  laterTasks.value = updateTaskList(laterTasks.value)
 }
 
 const requestDeleteTask = async (taskId) => {
@@ -151,9 +161,15 @@ const requestDeleteTask = async (taskId) => {
       <aside class="side-panel">
         <div class="panel-block">
           <p class="panel-title">概览</p>
-          <div class="progress-ring" aria-hidden="true">
+          <div
+            class="progress-ring"
+            :style="{
+              background: `conic-gradient(#f97316 0 ${taskSummary.progress}%, rgba(226, 232, 240, 0.95) ${taskSummary.progress}% 100%)`,
+            }"
+            aria-hidden="true"
+          >
             <div class="progress-ring__inner">
-              <strong>63%</strong>
+              <strong>{{ taskSummary.progress }}%</strong>
               <span>本周进度</span>
             </div>
           </div>
@@ -173,8 +189,20 @@ const requestDeleteTask = async (taskId) => {
       <section class="list-panel">
         <TaskComposer @add="addTask" />
 
-        <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" @delete="requestDeleteTask" />
-        <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" @delete="requestDeleteTask" />
+        <TaskGroup
+          title="今天"
+          :count="todayTasks.length"
+          :items="todayTasks"
+          @delete="requestDeleteTask"
+          @toggle="toggleTaskDone"
+        />
+        <TaskGroup
+          title="稍后"
+          :count="laterTasks.length"
+          :items="laterTasks"
+          @delete="requestDeleteTask"
+          @toggle="toggleTaskDone"
+        />
       </section>
     </section>
 

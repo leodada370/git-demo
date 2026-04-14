@@ -1,5 +1,5 @@
 <script setup>
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'toggle'])
 
 defineProps({
   item: {
@@ -11,7 +11,13 @@ defineProps({
 
 <template>
   <li class="task-item" :class="{ 'is-done': item.done, 'is-muted': item.muted }">
-    <div class="task-check" aria-hidden="true"></div>
+    <button
+      type="button"
+      class="task-check"
+      :aria-label="item.done ? '取消完成任务' : '标记任务完成'"
+      :aria-pressed="item.done"
+      @click="emit('toggle', item.id)"
+    ></button>
     <div class="task-content">
       <h3>{{ item.title }}</h3>
       <p>{{ item.description }}</p>
@@ -47,9 +53,11 @@ defineProps({
 .task-check {
   width: 20px;
   height: 20px;
+  padding: 0;
   border-radius: 50%;
   border: 2px solid #cbd5e1;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  cursor: pointer;
 }
 
 .is-done .task-check {
