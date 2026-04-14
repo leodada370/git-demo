@@ -1,4 +1,6 @@
 <script setup>
+const emit = defineEmits(['delete'])
+
 defineProps({
   item: {
     type: Object,
@@ -14,7 +16,10 @@ defineProps({
       <h3>{{ item.title }}</h3>
       <p>{{ item.description }}</p>
     </div>
-    <span class="task-tag" :class="item.variant">{{ item.tag }}</span>
+    <div class="task-actions">
+      <span class="task-tag" :class="item.variant">{{ item.tag }}</span>
+      <button type="button" class="delete-button" @click="emit('delete', item.id)">删除</button>
+    </div>
   </li>
 </template>
 
@@ -72,6 +77,29 @@ defineProps({
   font-weight: 700;
 }
 
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.delete-button {
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #b91c1c;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background: rgba(254, 226, 226, 0.9);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
 .tag-soft {
   background: rgba(251, 146, 60, 0.14);
   color: #c2410c;
@@ -95,6 +123,11 @@ defineProps({
 @media (max-width: 720px) {
   .task-item {
     grid-template-columns: 1fr;
+  }
+
+  .task-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .task-tag {
