@@ -1,4 +1,50 @@
-<script setup></script>
+<script setup>
+import TaskComposer from './components/TaskComposer.vue'
+import TaskGroup from './components/TaskGroup.vue'
+
+const todayTasks = [
+  {
+    title: '规划本周看板',
+    description: '整理优先级，给本周任务建立清晰边界。',
+    tag: '工作',
+    variant: 'tag-soft',
+    done: true,
+  },
+  {
+    title: '查看设计参考',
+    description: '收集一版更稳定的视觉方向和色彩策略。',
+    tag: '设计',
+    variant: 'tag-warm',
+    done: false,
+  },
+  {
+    title: '整理实现说明',
+    description: '把需要后续接入的功能点提前标注出来。',
+    tag: '草稿',
+    variant: 'tag-ink',
+    done: false,
+  },
+]
+
+const laterTasks = [
+  {
+    title: '优化移动端间距',
+    description: '确保窄屏下卡片仍然保持呼吸感。',
+    tag: '界面',
+    variant: 'tag-muted',
+    done: false,
+    muted: true,
+  },
+  {
+    title: '补充最后润色',
+    description: '收尾时统一阴影、圆角和层级表现。',
+    tag: '润色',
+    variant: 'tag-muted',
+    done: false,
+    muted: true,
+  },
+]
+</script>
 
 <template>
   <main class="todo-app">
@@ -54,72 +100,10 @@
       </aside>
 
       <section class="list-panel">
-        <div class="composer" aria-label="新任务输入预览">
-          <div class="composer-input">
-            <span class="composer-dot" aria-hidden="true"></span>
-            <span class="composer-placeholder">添加一个新任务...</span>
-          </div>
-          <button type="button" class="composer-action">创建</button>
-        </div>
+        <TaskComposer />
 
-        <div class="task-group">
-          <div class="group-header">
-            <h2>今天</h2>
-            <span>4 项</span>
-          </div>
-
-          <article class="task-item is-done">
-            <div class="task-check" aria-hidden="true"></div>
-            <div class="task-content">
-              <h3>规划本周看板</h3>
-              <p>整理优先级，给本周任务建立清晰边界。</p>
-            </div>
-            <span class="task-tag tag-soft">工作</span>
-          </article>
-
-          <article class="task-item">
-            <div class="task-check" aria-hidden="true"></div>
-            <div class="task-content">
-              <h3>查看设计参考</h3>
-              <p>收集一版更稳定的视觉方向和色彩策略。</p>
-            </div>
-            <span class="task-tag tag-warm">设计</span>
-          </article>
-
-          <article class="task-item">
-            <div class="task-check" aria-hidden="true"></div>
-            <div class="task-content">
-              <h3>整理实现说明</h3>
-              <p>把需要后续接入的功能点提前标注出来。</p>
-            </div>
-            <span class="task-tag tag-ink">草稿</span>
-          </article>
-        </div>
-
-        <div class="task-group">
-          <div class="group-header">
-            <h2>稍后</h2>
-            <span>2 项</span>
-          </div>
-
-          <article class="task-item is-muted">
-            <div class="task-check" aria-hidden="true"></div>
-            <div class="task-content">
-              <h3>优化移动端间距</h3>
-              <p>确保窄屏下卡片仍然保持呼吸感。</p>
-            </div>
-            <span class="task-tag tag-muted">界面</span>
-          </article>
-
-          <article class="task-item is-muted">
-            <div class="task-check" aria-hidden="true"></div>
-            <div class="task-content">
-              <h3>补充最后润色</h3>
-              <p>收尾时统一阴影、圆角和层级表现。</p>
-            </div>
-            <span class="task-tag tag-muted">润色</span>
-          </article>
-        </div>
+        <TaskGroup title="今天" :count="todayTasks.length" :items="todayTasks" />
+        <TaskGroup title="稍后" :count="laterTasks.length" :items="laterTasks" />
       </section>
     </section>
   </main>
@@ -319,8 +303,7 @@ p {
 }
 
 .filter-pill,
-.composer-action,
-.task-tag {
+.composer-action {
   border: 0;
   border-radius: 999px;
 }
@@ -340,146 +323,6 @@ p {
   padding: 24px;
 }
 
-.composer {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.94));
-}
-
-.composer-input {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-height: 56px;
-  padding: 0 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(248, 250, 252, 0.72);
-}
-
-.composer-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f97316, #fbbf24);
-  box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.14);
-}
-
-.composer-placeholder {
-  font-size: 0.98rem;
-}
-
-.composer-action {
-  padding: 14px 20px;
-  background: #f8fafc;
-  color: #111827;
-  font-weight: 700;
-}
-
-.task-group {
-  margin-top: 24px;
-}
-
-.task-group + .task-group {
-  margin-top: 20px;
-}
-
-.group-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.group-header h2 {
-  font-size: 1.05rem;
-  color: #0f172a;
-}
-
-.group-header span {
-  font-size: 0.88rem;
-  color: #64748b;
-}
-
-.task-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  padding: 18px 18px;
-  border-radius: 22px;
-  background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-}
-
-.task-item + .task-item {
-  margin-top: 12px;
-}
-
-.task-item.is-done {
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-}
-
-.task-item.is-muted {
-  background: #fbfdff;
-}
-
-.task-check {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #cbd5e1;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-}
-
-.is-done .task-check {
-  border-color: #22c55e;
-  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-}
-
-.task-content h3 {
-  font-size: 1rem;
-  color: #0f172a;
-}
-
-.task-content p {
-  margin-top: 6px;
-  font-size: 0.93rem;
-  line-height: 1.6;
-  color: #64748b;
-}
-
-.task-tag {
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.tag-soft {
-  background: rgba(251, 146, 60, 0.14);
-  color: #c2410c;
-}
-
-.tag-warm {
-  background: rgba(251, 191, 36, 0.18);
-  color: #a16207;
-}
-
-.tag-ink {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4f46e5;
-}
-
-.tag-muted {
-  background: #e2e8f0;
-  color: #475569;
-}
-
 @media (max-width: 1080px) {
   .hero-panel,
   .workspace {
@@ -488,10 +331,6 @@ p {
 
   .hero-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .progress-ring {
-    width: min(100%, 260px);
   }
 }
 
@@ -512,20 +351,6 @@ p {
 
   .hero-stats {
     grid-template-columns: 1fr;
-  }
-
-  .composer,
-  .task-item {
-    grid-template-columns: 1fr;
-  }
-
-  .composer {
-    align-items: stretch;
-  }
-
-  .composer-action,
-  .task-tag {
-    width: fit-content;
   }
 }
 </style>
