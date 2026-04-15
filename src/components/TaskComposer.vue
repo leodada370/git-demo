@@ -6,17 +6,34 @@ const emit = defineEmits(['add'])
 const title = ref('')
 const description = ref('')
 const type = ref('工作')
+const titleError = ref('')
+
+const validateTitle = (value) => {
+  if (!value.trim()) {
+    return '任务标题不能为空'
+  }
+
+  if (/\s/.test(value)) {
+    return '任务标题不能包含空格'
+  }
+
+  return ''
+}
 
 const submitTask = () => {
-  const nextTitle = title.value.trim()
+  const nextTitle = title.value
   const nextDescription = description.value.trim()
+  const error = validateTitle(nextTitle)
 
-  if (!nextTitle) {
+  if (error) {
+    titleError.value = error
     return
   }
 
+  titleError.value = ''
+
   emit('add', {
-    title: nextTitle,
+    title: nextTitle.trim(),
     description: nextDescription,
     type: type.value,
   })
@@ -31,8 +48,16 @@ const submitTask = () => {
   <form class="composer" aria-label="新任务输入表单" @submit.prevent="submitTask">
     <label class="composer-input">
       <span class="composer-dot" aria-hidden="true"></span>
-      <input v-model="title" type="text" class="composer-field" placeholder="添加一个新任务..." />
+      <input
+        v-model="title"
+        type="text"
+        class="composer-field"
+        :class="{ 'composer-field--invalid': titleError }"
+        placeholder="添加一个新任务..."
+        @input="titleError = ''"
+      />
     </label>
+    <p v-if="titleError" class="composer-error">{{ titleError }}</p>
 
     <label class="composer-input composer-input--secondary">
       <span class="composer-dot composer-dot--subtle" aria-hidden="true"></span>
@@ -119,6 +144,16 @@ const submitTask = () => {
 
 .composer-field::placeholder {
   color: rgba(248, 250, 252, 0.5);
+}
+
+.composer-field--invalid {
+  color: #fecaca;
+}
+
+.composer-error {
+  margin: 0;
+  color: #fecaca;
+  font-size: 0.85rem;
 }
 
 .composer-select {
